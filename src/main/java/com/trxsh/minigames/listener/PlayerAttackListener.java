@@ -21,8 +21,6 @@ public class PlayerAttackListener implements Listener {
                 Player damaged = (Player)e.getEntity();
                 Player attacker = (Player)e.getDamager();
 
-                Bukkit.broadcastMessage(attacker.getName() + " hit " + damaged.getName() + "!");
-
                 if(MinigameHandler.current != null) {
 
                     Minigame m = MinigameHandler.current;
