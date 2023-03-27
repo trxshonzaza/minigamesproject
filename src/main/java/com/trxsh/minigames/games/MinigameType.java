@@ -8,7 +8,8 @@ public enum MinigameType {
     TNT_TAG,
     PREY,
     CRANKED,
-    FREE_FOR_ALL;
+    FREE_FOR_ALL,
+    FREEZE_TAG;
 
     public static MinigameType get(String name) {
 

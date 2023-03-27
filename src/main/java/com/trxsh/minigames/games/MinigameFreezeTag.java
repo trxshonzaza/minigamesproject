@@ -5,30 +5,29 @@ import com.trxsh.minigames.handler.MinigameHandler;
 import com.trxsh.minigames.utility.Team;
 import com.trxsh.minigames.utility.TeamType;
 import org.bukkit.*;
-import org.bukkit.entity.*;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.projectiles.ProjectileSource;
-import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
-public class MinigameTag extends Minigame {
+public class MinigameFreezeTag extends Minigame {
 
-    public Player whosIt = null;
+    public List<Player> frozen = new ArrayList();
+    public Player whosIt;
 
     private Team red;
     private Team blue;
 
-    public MinigameTag(String name, String description, long duration, GameMode mode, MinigameType type) {
+    public MinigameFreezeTag(String name, String description, long duration, GameMode mode, MinigameType type) {
         super(name, description, duration, mode, type);
     }
 
@@ -37,15 +36,62 @@ public class MinigameTag extends Minigame {
 
         if(started) {
 
+            for(Player player : frozen) {
+
+                if(hit == player && attacker != whosIt) {
+
+                    frozen.remove(player);
+
+                    red.removePlayer(hit);
+                    blue.addPlayer(hit);
+
+                    removePlayerIce(hit);
+
+                    Firework firework = hit.getWorld().spawn(hit.getLocation(), Firework.class);
+
+                    FireworkMeta m = firework.getFireworkMeta();
+
+                    m.addEffect(FireworkEffect.builder()
+
+                            .flicker(true)
+                            .trail(true)
+                            .with(FireworkEffect.Type.BALL_LARGE)
+                            .with(FireworkEffect.Type.BALL)
+                            .withColor(Color.BLUE)
+                            .withColor(Color.AQUA)
+                            .build());
+
+                    m.setPower(0);
+                    firework.setFireworkMeta(m);
+
+                    Bukkit.broadcastMessage(ChatColor.AQUA + hit.getName() + ChatColor.WHITE + " is" + ChatColor.AQUA + "" + ChatColor.BOLD + " UNFROZEN!");
+
+                    return;
+
+                }
+
+            }
+
+            if(frozen.contains(hit))
+                return;
+
             if(attacker != whosIt)
                 return;
 
             blue.removePlayer(hit);
             red.addPlayer(hit);
 
-            whosIt = hit;
+            frozen.add(hit);
+            givePlayerIce(hit);
 
-            whosIt.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1));
+            if(blue.players.isEmpty()) {
+
+                stop();
+                return;
+
+            }
+
+            //hit.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1));
 
             Firework firework = hit.getWorld().spawn(hit.getLocation(), Firework.class);
 
@@ -64,7 +110,7 @@ public class MinigameTag extends Minigame {
             m.setPower(0);
             firework.setFireworkMeta(m);
 
-            Bukkit.broadcastMessage(ChatColor.RED + whosIt.getName() + ChatColor.WHITE + " is " + ChatColor.RED + "" + ChatColor.BOLD + "IT!");
+            Bukkit.broadcastMessage(ChatColor.RED + hit.getName() + ChatColor.WHITE + " is" + ChatColor.AQUA + "" + ChatColor.BOLD + " FROZEN!");
 
         }
 
@@ -93,14 +139,15 @@ public class MinigameTag extends Minigame {
 
         List<Player> determine = playing;
 
-        whosIt = ((Player)determine.toArray()[new Random().nextInt(determine.size())]);
+         Player toBeIt = ((Player)determine.toArray()[new Random().nextInt(determine.size())]);
 
         List<Player> teamDetermine = new ArrayList();
         List<Player> teamDetermine1 = playing;
 
-        teamDetermine.add(whosIt);
+        teamDetermine.add(toBeIt);
+        teamDetermine1.remove(toBeIt);
 
-        teamDetermine1.remove(whosIt);
+        whosIt = toBeIt;
 
         try {
 
@@ -109,7 +156,7 @@ public class MinigameTag extends Minigame {
 
         } catch (IllegalAccessException e) { e.printStackTrace(); }
 
-        Bukkit.broadcastMessage(ChatColor.RED + whosIt.getName() + ChatColor.WHITE + " is " + ChatColor.RED + "" + ChatColor.BOLD + " IT!");
+        Bukkit.broadcastMessage(ChatColor.RED + toBeIt.getName() + ChatColor.WHITE + " is" + ChatColor.AQUA + "" + ChatColor.BOLD + " IT!");
         Bukkit.broadcastMessage(ChatColor.RED + "Start running!");
 
         started = true;
@@ -139,7 +186,10 @@ public class MinigameTag extends Minigame {
 
         }
 
+        removeAllPlayerIce();
+
         playing.clear();
+        frozen.clear();
         super.removeAllSpectators();
 
         whosIt = null;
@@ -150,4 +200,36 @@ public class MinigameTag extends Minigame {
         started = false;
         MinigameHandler.current = null;
     }
+
+    public void givePlayerIce(Player player) {
+
+        ItemStack item = new ItemStack(Material.ICE);
+
+        ItemMeta m = item.getItemMeta();
+
+        m.addEnchant(Enchantment.BINDING_CURSE, 1, true);
+        m.addEnchant(Enchantment.VANISHING_CURSE, 1, true);
+
+        item.setItemMeta(m);
+
+        player.getInventory().setHelmet(item);
+
+    }
+
+    public void removePlayerIce(Player player) {
+
+        player.getInventory().setHelmet(null);
+
+    }
+
+    public void removeAllPlayerIce() {
+
+        for(Player player : frozen) {
+
+            player.getInventory().setHelmet(null);
+
+        }
+
+    }
+
 }

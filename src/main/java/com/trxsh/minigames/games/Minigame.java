@@ -75,14 +75,38 @@ public abstract class Minigame {
     public void addSpectator(Player player) {
 
         player.setGameMode(GameMode.SPECTATOR);
+        spectating.add(player);
 
-        Bukkit.broadcastMessage("spectator is " + player.getName());
+        Bukkit.broadcastMessage("add spectator: " + player.getName());
+
+    }
+
+    public void removeSpectator(Player player) {
+
+        player.setGameMode(GameMode.ADVENTURE);
+        spectating.remove(player);
+
+        Bukkit.broadcastMessage("remove spectator: " + player.getName());
+
+    }
+
+    public void removeAllSpectators() {
+
+        for(Player player : spectating) {
+
+            player.setGameMode(GameMode.ADVENTURE);
+
+            Bukkit.broadcastMessage("remove spectator: " + player.getName());
+
+        }
+
+        spectating.clear();
 
     }
 
     public void teleportAllPlayersToWorldSpawn() {
 
-        for(Player player : playing) {
+        for(Player player : Bukkit.getOnlinePlayers()) {
 
             player.teleport(player.getWorld().getSpawnLocation());
 
@@ -92,9 +116,9 @@ public abstract class Minigame {
 
     public void teleportAllPlayersToLocation(Location location) {
 
-        for(Player player : playing) {
+        for(Player player : Bukkit.getOnlinePlayers()) {
 
-            player.teleport(player.getWorld().getSpawnLocation());
+            player.teleport(location);
 
         }
 

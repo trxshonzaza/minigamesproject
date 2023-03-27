@@ -1,6 +1,7 @@
 package com.trxsh.minigames.games;
 
 import com.trxsh.minigames.Main;
+import com.trxsh.minigames.handler.MinigameHandler;
 import com.trxsh.minigames.utility.Team;
 import com.trxsh.minigames.utility.TeamType;
 import org.bukkit.*;
@@ -134,12 +135,13 @@ public class MinigameManhunt extends Minigame {
         }
 
         playing.clear();
-        spectating.clear();
+        super.removeAllSpectators();
         it.clear();
 
         red.removeAllPlayers();
         blue.removeAllPlayers();
 
         started = false;
+        MinigameHandler.current = null;
     }
 }

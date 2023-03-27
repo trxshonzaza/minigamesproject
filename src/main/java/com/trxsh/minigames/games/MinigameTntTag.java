@@ -1,6 +1,7 @@
 package com.trxsh.minigames.games;
 
 import com.trxsh.minigames.Main;
+import com.trxsh.minigames.handler.MinigameHandler;
 import com.trxsh.minigames.utility.Team;
 import com.trxsh.minigames.utility.TeamType;
 import org.bukkit.*;
@@ -152,7 +153,7 @@ public class MinigameTntTag extends Minigame {
         }
 
         playing.clear();
-        spectating.clear();
+        super.removeAllSpectators();
 
         whosIt = null;
 
@@ -160,6 +161,7 @@ public class MinigameTntTag extends Minigame {
         blue.removeAllPlayers();
 
         started = false;
+        MinigameHandler.current = null;
     }
 
     public void handleTNTDeath() {
@@ -175,6 +177,8 @@ public class MinigameTntTag extends Minigame {
 
         Bukkit.broadcastMessage(whosIt.getName() + " died!");
 
+        addSpectator(whosIt);
+        whosIt = null;
 
         if(blue.players.size() == 1) {
 
@@ -182,9 +186,6 @@ public class MinigameTntTag extends Minigame {
             return;
 
         }
-
-        addSpectator(whosIt);
-        whosIt = null;
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, new Runnable() {
             @Override
