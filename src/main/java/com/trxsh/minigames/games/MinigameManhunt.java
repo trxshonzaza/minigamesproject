@@ -4,30 +4,25 @@ import com.trxsh.minigames.Main;
 import com.trxsh.minigames.utility.Team;
 import com.trxsh.minigames.utility.TeamType;
 import org.bukkit.*;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.projectiles.ProjectileSource;
-import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
-public class MinigameTag extends Minigame {
+public class MinigameManhunt extends Minigame {
 
-    public Player whosIt = null;
+    public List<Player> it = new ArrayList();
 
     private Team red;
     private Team blue;
 
-    public MinigameTag(String name, String description, long duration, GameMode mode, MinigameType type) {
+    public MinigameManhunt(String name, String description, long duration, GameMode mode, MinigameType type) {
         super(name, description, duration, mode, type);
     }
 
@@ -36,15 +31,23 @@ public class MinigameTag extends Minigame {
 
         if(started) {
 
-            if(attacker != whosIt)
-                return;
+            for(Player player : it)
+                if(hit == player)
+                    return;
 
             blue.removePlayer(hit);
             red.addPlayer(hit);
 
-            whosIt = hit;
+            it.add(hit);
 
-            whosIt.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1));
+            if(blue.players.isEmpty()) {
+
+                stop();
+                return;
+
+            }
+
+            hit.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1));
 
             Firework firework = hit.getWorld().spawn(hit.getLocation(), Firework.class);
 
@@ -63,7 +66,7 @@ public class MinigameTag extends Minigame {
             m.setPower(0);
             firework.setFireworkMeta(m);
 
-            Bukkit.broadcastMessage(ChatColor.RED + whosIt.getName() + ChatColor.WHITE + " is " + ChatColor.RED + "" + ChatColor.BOLD + "IT!");
+            Bukkit.broadcastMessage(ChatColor.RED + hit.getName() + ChatColor.WHITE + " was" + ChatColor.RED + "" + ChatColor.BOLD + " TAGGED!");
 
         }
 
@@ -92,14 +95,15 @@ public class MinigameTag extends Minigame {
 
         List<Player> determine = playing;
 
-        whosIt = ((Player)determine.toArray()[new Random().nextInt(determine.size())]);
+         Player toBeIt = ((Player)determine.toArray()[new Random().nextInt(determine.size())]);
 
         List<Player> teamDetermine = new ArrayList();
         List<Player> teamDetermine1 = playing;
 
-        teamDetermine.add(whosIt);
+        teamDetermine.add(toBeIt);
+        teamDetermine1.remove(toBeIt);
 
-        teamDetermine1.remove(whosIt);
+        it.add(toBeIt);
 
         try {
 
@@ -108,19 +112,10 @@ public class MinigameTag extends Minigame {
 
         } catch (IllegalAccessException e) { e.printStackTrace(); }
 
-        Bukkit.broadcastMessage(ChatColor.RED + whosIt.getName() + ChatColor.WHITE + " is " + ChatColor.RED + "" + ChatColor.BOLD + " IT!");
+        Bukkit.broadcastMessage(ChatColor.RED + toBeIt.getName() + ChatColor.WHITE + " is" + ChatColor.RED + "" + ChatColor.BOLD + " IT!");
         Bukkit.broadcastMessage(ChatColor.RED + "Start running!");
 
         started = true;
-
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, new Runnable() {
-            @Override
-            public void run() {
-
-                stop();
-
-            }
-        }, duration * 20L);
 
     }
 
@@ -140,8 +135,7 @@ public class MinigameTag extends Minigame {
 
         playing.clear();
         spectating.clear();
-
-        whosIt = null;
+        it.clear();
 
         red.removeAllPlayers();
         blue.removeAllPlayers();

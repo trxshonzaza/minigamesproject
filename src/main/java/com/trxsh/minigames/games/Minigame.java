@@ -76,7 +76,7 @@ public abstract class Minigame {
 
         player.setGameMode(GameMode.SPECTATOR);
 
-        Bukkit.getConsoleSender().sendMessage("spectator is " + player.getName());
+        Bukkit.broadcastMessage("spectator is " + player.getName());
 
     }
 

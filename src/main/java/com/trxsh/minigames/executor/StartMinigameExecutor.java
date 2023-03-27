@@ -3,9 +3,12 @@ package com.trxsh.minigames.executor;
 import com.trxsh.minigames.games.Minigame;
 import com.trxsh.minigames.games.MinigameType;
 import com.trxsh.minigames.handler.MinigameHandler;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class StartMinigameExecutor implements CommandExecutor {
 
@@ -15,17 +18,26 @@ public class StartMinigameExecutor implements CommandExecutor {
 
         if(command.getName().equalsIgnoreCase("start")) {
 
-            if(args.length == 0) {
+            if(sender.isOp()) {
 
-                sender.sendMessage("you must mark a game to play");
-                return true;
+                if(args.length == 0) {
 
-            } else {
+                    sender.sendMessage("you must mark a game to play");
+                    return true;
 
-                Minigame minigame = MinigameHandler.getMinigame(args[0]);
+                } else {
 
-                MinigameHandler.startMinigame(minigame);
+                    Minigame minigame = MinigameHandler.getMinigame(args[0]);
 
+                    MinigameHandler.startMinigame(minigame);
+
+                    return true;
+
+                }
+
+            }else {
+
+                sender.sendMessage("missing op!");
                 return true;
 
             }
