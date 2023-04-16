@@ -2,6 +2,7 @@ package com.trxsh.minigames.games;
 
 import com.trxsh.minigames.data.GameStatistics;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -44,7 +45,28 @@ public abstract class Minigame {
 
     }
 
+    public Minigame(String name, String description, long duration, GameMode mode, MinigameType type, HashMap<ItemStack, EquipmentSlot> itemsNeeded) {
+
+        this.name = name;
+        this.description = description;
+        this.duration = duration;
+        this.mode = mode;
+        this.type = type;
+        this.itemsNeeded = itemsNeeded;
+
+    }
+
     public void init() {
+
+        String line = System.getProperty("line.separator");
+
+        StringBuilder desc = new StringBuilder();
+
+        desc.append(ChatColor.AQUA + "" + ChatColor.BOLD + name + line);
+        desc.append(ChatColor.GOLD + "" + ChatColor.BOLD + "Game Description" + line);
+        desc.append(ChatColor.BOLD + description + line);
+
+        Bukkit.broadcastMessage(desc.toString());
 
         if(!itemsNeeded.isEmpty()) {
 

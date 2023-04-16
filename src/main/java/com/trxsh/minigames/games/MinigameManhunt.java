@@ -85,7 +85,7 @@ public class MinigameManhunt extends Minigame {
 
         }
 
-        if(playing.size() < 1) {
+        if(playing.size() < 2) {
 
             Bukkit.broadcastMessage("too little players");
             return;

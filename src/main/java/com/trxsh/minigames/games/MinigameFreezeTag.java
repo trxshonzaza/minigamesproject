@@ -22,6 +22,7 @@ import java.util.Random;
 public class MinigameFreezeTag extends Minigame {
 
     public List<Player> frozen = new ArrayList();
+
     public Player whosIt;
 
     private Team red;
@@ -128,7 +129,7 @@ public class MinigameFreezeTag extends Minigame {
 
         }
 
-        if(playing.size() < 1) {
+        if(playing.size() < 2) {
 
             Bukkit.broadcastMessage("too little players");
             return;

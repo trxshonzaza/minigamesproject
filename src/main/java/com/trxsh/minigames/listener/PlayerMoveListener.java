@@ -4,6 +4,7 @@ import com.trxsh.minigames.games.Minigame;
 import com.trxsh.minigames.games.MinigameFreezeTag;
 import com.trxsh.minigames.games.MinigameType;
 import com.trxsh.minigames.handler.MinigameHandler;
+import com.trxsh.minigames.handler.PostGameHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -31,6 +32,10 @@ public class PlayerMoveListener implements Listener {
                 }
 
             }
+
+        }else if(PostGameHandler.post) {
+
+            e.getPlayer().teleport(PostGameHandler.forceTPLocation);
 
         }
 

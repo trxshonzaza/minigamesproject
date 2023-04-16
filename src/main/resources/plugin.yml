@@ -8,3 +8,6 @@ commands:
   start:
     description: starts a minigame
     command: /<command>
+  spawnfakeplayer:
+    description: spawns a fake player (npc)
+    command: /<command>
